@@ -3,10 +3,12 @@ rm(list=ls())
 library(reshape)
 library(ggplot2)
 
-# source("~/Documents/GitHub/PhysMAP_Chand/constants.R")
-source("~/Documents/GitHub/PhysMAP_Chand/juxtacellular/helperFunctions.r")
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
 
-allData = readMat("~/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/MergedData.mat");
+source("../helperFunctions.r")
+
+allData = readMat("./JianingData/MergedData.mat");
 
 plot.waveforms = function(data,layer.cell.type,modality)
 { layerData = data$layer;

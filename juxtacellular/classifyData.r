@@ -5,6 +5,8 @@ library(tidyverse)
 library(caret)
 library(nnet)
 
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
 
 dataSummary <- function(data, varname, groupnames){
   require(plyr)
@@ -89,8 +91,8 @@ meanAccWf = list()
 meanAccConcat = list()
 
 print("Running classification analysis ....")
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/width.Rda')
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/ratio_p2t.Rda')
+load('./JianingData/width.Rda')
+load('./JianingData/ratio_p2t.Rda')
 
 for(i in 1:20)
 {

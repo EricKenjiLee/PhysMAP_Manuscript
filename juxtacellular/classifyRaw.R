@@ -1,7 +1,10 @@
 library(caret)
 set.seed(42)
 
-temp = readMat("~/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/MergedData.mat")
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+temp = readMat("./JianingData/MergedData.mat")
 numCells = dim(temp$depth);
 cellIds = c(seq(numCells[2],numCells[1]))
 depthV = temp$depth
@@ -25,8 +28,8 @@ colnames(mergedISI) = c(seq(1,100))
 data = CreateSeuratObject(counts = t(mergedISI), assay = "ISI")
 data$orig.ident = temp$true.cell.type;
 
-load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/width.Rda")
-load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/ratio_p2t.Rda")
+load("./JianingData/width.Rda")
+load("./JianingData/ratio_p2t.Rda")
 ratio.p2t = ratio_p2t
 temp$features = cbind(temp$features,width,ratio.p2t)
 

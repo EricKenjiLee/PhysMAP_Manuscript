@@ -1,5 +1,8 @@
-source("~/Documents/GitHub/PhysMAP_Chand/constants.R")
-source("~/Documents/GitHub/PhysMAP_Chand/juxtacellular/helperFunctions.r")
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+source("../constants.R")
+source("./helperFunctions.r")
 
 library(ggExtra)
 library(ggpubr)
@@ -11,7 +14,7 @@ nDims = 30
 numComponents = UMAP.components #originally 10
 
 # Calculates the individual representations and plots them nicely.
-allData = readJianingData("~/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/MergedData.mat");
+allData = readJianingData("./JianingData/MergedData.mat");
 juxtaData =  allData$data;
 tempFeat = calcRepresentation(juxtaData, 'features',5,1:5)
 juxtaData =  tempFeat$data;
@@ -138,8 +141,8 @@ pComb = p1 | p2 | p3
 show(pInd)
 show(pComb)
 
-load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/width.Rda")
-load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/ratio_p2t.Rda")
+load("./JianingData/width.Rda")
+load("./JianingData/ratio_p2t.Rda")
 
 # Show plots of points colored in different ways according to other variables
 # such as latency
