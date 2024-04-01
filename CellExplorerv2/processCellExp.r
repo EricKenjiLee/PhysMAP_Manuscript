@@ -1,3 +1,6 @@
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
 library(tidyverse)
 library(caret)
 library(nnet)
@@ -5,15 +8,15 @@ UMAP.SEED = 3;
 ALGORITHM = 3;
 
 
-rawD = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/CellExplorerv2/Data/theta_modulation_index.mat")
+rawD = readMat("./Data/theta_modulation_index.mat")
 thetaMod = rawD$test
 
-featureData = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/features_cellExp_final_Dec2023.mat")
+featureData = readMat("./Data/features_cellExp_new_Nov2023.mat")
 features = featureData$features
 
-acgData = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/CellExplorerv2/Data/CellExplorer_ACG.mat")
+acgData = readMat("./Data/CellExplorer_ACG.mat")
 
-WFce = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/CellExplorerv2/Data/finalWaveforms.mat");
+WFce = readMat("./Data/finalWaveforms.mat");
 X_waveform = WFce$X
 cType = WFce$CellTypeNames
 
@@ -49,7 +52,7 @@ data@meta.data = cbind(data@meta.data, area)
 
 
 
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/CellExplorerv2/Data/isi_cellExp.Rda')
+load('./Data/isi_cellExp.Rda')
 X_ISI = t(isi)
 dataSize = dim(X_ISI)
 rownames(X_ISI) = cellIds

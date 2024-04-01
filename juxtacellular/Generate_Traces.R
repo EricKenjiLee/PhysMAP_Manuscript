@@ -6,7 +6,7 @@ library(ggplot2)
 basedir <- dirname(sys.frame(1)$ofile)
 setwd(basedir)
 
-source("../helperFunctions.r")
+source("./helperFunctions.r")
 
 allData = readMat("./JianingData/MergedData.mat");
 
