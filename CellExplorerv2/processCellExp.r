@@ -11,7 +11,9 @@ ALGORITHM = 3;
 rawD = readMat("./Data/theta_modulation_index.mat")
 thetaMod = rawD$test
 
+featureData = readMat("../lookupTable/data/features_cellExp_final_Dec2023.mat")
 featureData = readMat("./Data/features_cellExp_new_Nov2023.mat")
+
 features = featureData$features
 
 acgData = readMat("./Data/CellExplorer_ACG.mat")
@@ -21,7 +23,6 @@ X_waveform = WFce$X
 cType = WFce$CellTypeNames
 
 ## Now look at area*type labels
-
 area.cType = unlist(featureData$area)
 area.cType = sub("VISal", "VIS", area.cType)
 area.cType = sub("VISam", "VIS", area.cType)
@@ -51,12 +52,11 @@ area = unlist(featureData$area)
 data@meta.data = cbind(data@meta.data, area)
 
 
-
 load('./Data/isi_cellExp.Rda')
 X_ISI = t(isi)
 dataSize = dim(X_ISI)
 rownames(X_ISI) = cellIds
-colnames(X_ISI) = c(seq(1,dataSize[2]+1))
+colnames(X_ISI) = c(seq(1,dataSize[2]))
 ISI_assay <- CreateAssayObject(counts = t(X_ISI))
 data[["ISI1"]] = ISI_assay
 
@@ -65,7 +65,7 @@ acg = acgData$acgW
 X_ACG = t(acg)
 dataSize = dim(X_ACG)
 rownames(X_ACG) = cellIds
-colnames(X_ACG) = c(seq(1,dataSize[2]+1))
+colnames(X_ACG) = c(seq(1,dataSize[2]))
 ISI_assay <- CreateAssayObject(counts = t(X_ACG))
 data[["ACG"]] = ISI_assay
 
@@ -73,7 +73,7 @@ data[["ACG"]] = ISI_assay
 X_features = features
 dataSize = dim(X_features)
 rownames(X_features) = cellIds
-colnames(X_features) = c(seq(1,dataSize[2]+1))
+colnames(X_features) = c(seq(1,dataSize[2]))
 features_assay <- CreateAssayObject(counts = t(X_features))
 data[["features"]] = features_assay
 
@@ -137,7 +137,7 @@ whichAssay = "ACG"
 data = runAnalysis(data, whichAssay, RESOLUTION = RESOLUTION, normalize=TRUE)
 p1 = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2)
 pACG = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2, group.by = "cType", 
-             cols=cValues) + theme_minimal() + ggtitle("Features")
+             cols=cValues) + theme_minimal() + ggtitle("ACG")
 show(pACG)
 dA = calcARI(data, "ACG")
 
