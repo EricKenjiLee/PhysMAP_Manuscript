@@ -5,10 +5,13 @@ UMAP.SEED = 3;
 ALGORITHM = 3;
 NORMALIZE = TRUE;
 
-rawD = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/theta_modulation_index.mat")
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+rawD = readMat("./data/theta_modulation_index.mat")
 thetaMod = rawD$test
 
-featureData = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/features_cellExp_new_Jun2023.mat")
+featureData = readMat("./data/features_cellExp_new_Jun2023.mat")
 features = featureData$features
 nData = dim(features)
 
@@ -22,7 +25,7 @@ remData = setdiff(actualData, selectedData)
 # remData = selectedData
 
 
-WFce = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/finalWaveforms.mat");
+WFce = readMat("./data/finalWaveforms.mat");
 X_waveform = WFce$X[selectedData,]
 cType = WFce$CellTypeNames[selectedData]
 thetaMod = thetaMod[selectedData]
@@ -36,7 +39,7 @@ refdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 refdata@meta.data <-cbind(refdata@meta.data,cType)
 refdata@meta.data = cbind(refdata@meta.data, thetaMod)
 
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/isi_cellExp.Rda')
+load('./data/isi_cellExp.Rda')
 X_ISI = t(isi)
 X_ISI = X_ISI[selectedData, ]
 dataSize = dim(X_ISI)
@@ -56,7 +59,7 @@ refdata[["features"]] = features_assay
 
 
 #
-WFce = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/finalWaveforms.mat");
+WFce = readMat("./data/finalWaveforms.mat");
 X_waveform = WFce$X[remData,]
 cType = WFce$CellTypeNames[remData]
 thetaMod = thetaMod[remData]
@@ -70,7 +73,7 @@ mapdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 mapdata@meta.data <-cbind(mapdata@meta.data,cType)
 mapdata@meta.data = cbind(mapdata@meta.data, thetaMod)
 
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/isi_cellExp.Rda')
+load('./data/isi_cellExp.Rda')
 X_ISI = t(isi)
 X_ISI = X_ISI[remData, ]
 dataSize = dim(X_ISI)
@@ -224,5 +227,4 @@ plotProb = function(data, whichAssay, modulation, cType)
   pProb = p
   return(pProb)
 }
-
-pJoint = plotProb(refdata, "wnn.umap", t(thetaMod), cType)
+# pJoint = plotProb(refdata, "wnn.umap", t(thetaMod), cType)

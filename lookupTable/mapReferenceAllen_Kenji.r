@@ -2,22 +2,26 @@ library(tidyverse)
 library(caret)
 library(nnet)
 library(reshape2)
-source("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/constants.R")
+
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+source("../constants.R")
 
 
 NORMALIZE = TRUE
 set.seed(788)
 
-rawD = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/theta_modulation_index.mat")
+rawD = readMat("./data/theta_modulation_index.mat")
 thetaMod = rawD$test
 
-featureData = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/features_cellExp_final_Dec2023.mat")
+featureData = readMat("./data/features_cellExp_final_Dec2023.mat")
 features = featureData$features
 
 nData = dim(features)
 
 # selectedData = featureData$nonAllenNeurons
-selectedData = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/CellExplorerv2/Data/validNeurons.mat")$allValid.ix
+selectedData = readMat("../CellExplorerv2/Data/validNeurons.mat")$allValid.ix
 
 actualData = seq(1, nData[1])
 fullAllenData = intersect(actualData, selectedData)
@@ -29,7 +33,7 @@ remData = setdiff(fullAllenData, selectedData)
 # selectedData = fullAllenData
 # remData = selectedData
 
-WFce = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/finalWaveforms.mat");
+WFce = readMat("./data/finalWaveforms.mat");
 
 WFce$CellTypeNames = gsub("Juxt","Pyra",WFce$CellTypeNames)
 WFce$CellTypeNames = gsub("Axo_","PV",WFce$CellTypeNames)
@@ -47,7 +51,7 @@ refdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 refdata@meta.data <-cbind(refdata@meta.data,cType)
 refdata@meta.data = cbind(refdata@meta.data, thetaMod)
 
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/isi_cellExp.Rda')
+load('./data/isi_cellExp.Rda')
 X_ISI = t(isi)
 X_ISI = X_ISI[selectedData, ]
 dataSize = dim(X_ISI)
@@ -67,7 +71,7 @@ refdata[["features"]] = features_assay
 
 
 #
-WFce = readMat("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/finalWaveforms.mat");
+WFce = readMat("./data/finalWaveforms.mat");
 WFce$CellTypeNames = gsub("Juxt","Pyra",WFce$CellTypeNames)
 WFce$CellTypeNames = gsub("Axo_","PV",WFce$CellTypeNames)
 
@@ -84,7 +88,7 @@ mapdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 mapdata@meta.data <-cbind(mapdata@meta.data,cType)
 mapdata@meta.data = cbind(mapdata@meta.data, thetaMod)
 
-load('/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/lookupTable/data/isi_cellExp.Rda')
+load('./data/isi_cellExp.Rda')
 X_ISI = t(isi)
 X_ISI = X_ISI[remData, ]
 dataSize = dim(X_ISI)

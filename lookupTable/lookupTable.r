@@ -19,7 +19,7 @@ refdata <- RunUMAP(refdata, nn.name = "weighted.nn",
 refdata.query <- MapQuery(anchorset = refdata.anchors, reference = refdata, 
                            query = mapdata,
                            refdata = list(celltype = "cType"), 
-                           reference.reduction = "spca", reduction.model = "wnn.umap2")
+                           reference.reduction = "spca", reduction.model = "wnn.umap2",transferdata.args = list(k.weight = FALSE))
 p1 <- DimPlot(refdata, reduction = "wnn.umap2", group.by = "cType", label = TRUE, label.size = 3,
               repel = TRUE, cols=cValues) + NoLegend() + ggtitle("Reference annotations")
 p2 <- DimPlot(refdata.query, reduction = "ref.umap", group.by = "predicted.celltype", label = TRUE,
