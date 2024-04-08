@@ -192,7 +192,7 @@ refdata <- FindMultiModalNeighbors(
 refdata <- RunUMAP(refdata, nn.name = "weighted.nn", 
                 reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", seed.use=3)
 
-refdata <- FindClusters(refdata, graph.name = "wsnn", algorithm = 2, resolution = RESOLUTION, verbose = FALSE)
+refdata <- FindClusters(refdata, graph.name = "wsnn", algorithm = ALGORITHM, resolution = RESOLUTION, verbose = FALSE)
 
 p33 <- DimPlot(refdata, reduction = 'wnn.umap', pt.size=2, label = FALSE, repel = TRUE, label.size = 8)
 p33 <- p33 + theme_minimal()

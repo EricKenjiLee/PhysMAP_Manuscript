@@ -1,3 +1,6 @@
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
 readJianingData = function(MatFile)
 {
 
@@ -29,8 +32,8 @@ readJianingData = function(MatFile)
   data = CreateSeuratObject(counts = t(mergedISI), assay = "ISI")
   data$orig.ident = temp$true.cell.type;
   
-  load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/width.Rda")
-  load("/Users/kenjilee/Documents/GitHub/PhysMAP_Chand/juxtacellular/JianingData/ratio_p2t.Rda")
+  load(".\\juxtacellular\\JianingData\\width.Rda")
+  load(".\\juxtacellular\\JianingData\\ratio_p2t.Rda")
   ratio.p2t = ratio_p2t
   temp$features = cbind(temp$features,width,ratio.p2t)
 
