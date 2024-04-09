@@ -1,4 +1,5 @@
 # PhysMAP
+
 R code for multi-modal analysis to delineate cell types using electrophysiology.
 
 The following dependencies are not a strict requirement but are those in which we know are compatible. This project is <ins>not</ins> compatible with Seurat v5 as there were breaking changes introduced into our usage of anchor alignment.
@@ -7,9 +8,19 @@ The following dependencies are not a strict requirement but are those in which w
 
 Note: While this code reproduces figures in the associated manuscript, system (operating system) differences will result in plots that differ in appearance but this does not materially affect any results (see manuscript Supp. Fig. 2).
 
-## Dependencies
+## Generating Manuscript Figures
 
-Seurat v4 (4.1.0)
+Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can be done by simply running the scripts described below for each session. The only requirement is to first install Seurat v4 (and specifically v4) as newer versions of Seurat are incompatible with this analysis. To do this, the following steps should be followed.
+
+### Installation of Seurat v4
+
+### Mouse S1 Juxtacellular Dataset (Yu _et al._ 2019)
+
+### Mouse A1 Probe Extracellular Dataset (Lakunina _et al._ 2020)
+
+### Mouse Visual Cortex and Hippocampus Datasets (Petersen _et al._ 2021)
+
+### Cell Type Classifier (Petersen _et al._ 2021)
 
 ## Session Info
 R version 4.2.2 (2022-10-31)
