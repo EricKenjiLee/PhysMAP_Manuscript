@@ -6,7 +6,7 @@ cValues = c("orange","blue", "gray","red","magenta","cyan","yellow");
 
 refdata <- FindMultiModalNeighbors(
   refdata, reduction.list = list("WFpca","ISI1pca", 'featurespca'), 
-  dims.list = list(1:40, 1:40, 1:8), return.intermediate = TRUE,  knn.range = 100
+  dims.list = list(1:40, 1:40, 1:8), return.intermediate = TRUE,  knn.range = 25
 )
 refdata = RunSPCA(refdata, npcs=maxPCs, graph = "wsnn")
 

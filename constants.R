@@ -7,7 +7,7 @@ library(aricode)
 library(ggplot2)
 
 RESOLUTION = 2
-ALGORITHM = 1
+ALGORITHM = 2
 UMAP.SEED = 42
 
 UMAP.neighbors = 20;
