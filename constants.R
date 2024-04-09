@@ -8,7 +8,7 @@ library(ggplot2)
 
 RESOLUTION = 2
 ALGORITHM = 1
-UMAP.SEED = 3
+UMAP.SEED = 42
 
 UMAP.neighbors = 20;
 UMAP.mindist = 0.2

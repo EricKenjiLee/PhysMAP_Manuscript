@@ -2,26 +2,27 @@ library(tidyverse)
 library(caret)
 library(nnet)
 library(reshape2)
+library(here)
 
 basedir <- dirname(sys.frame(1)$ofile)
 setwd(basedir)
+here::i_am("README.md")
 
-source("../constants.R")
-
+source(here("constants.R"))
 
 NORMALIZE = TRUE
-set.seed(788)
+set.seed(UMAP.SEED)
 
-rawD = readMat("./data/theta_modulation_index.mat")
+rawD = readMat(here("lookupTable","data","theta_modulation_index.mat"))
 thetaMod = rawD$test
 
-featureData = readMat("./data/features_cellExp_final_Dec2023.mat")
+featureData = readMat(here("lookupTable","data","features_cellExp_final_Dec2023.mat"))
 features = featureData$features
 
 nData = dim(features)
 
 # selectedData = featureData$nonAllenNeurons
-selectedData = readMat("../CellExplorerv2/Data/validNeurons.mat")$allValid.ix
+selectedData = readMat(here("CellExplorerv2","Data","validNeurons.mat"))$allValid.ix
 
 actualData = seq(1, nData[1])
 fullAllenData = intersect(actualData, selectedData)
@@ -33,7 +34,7 @@ remData = setdiff(fullAllenData, selectedData)
 # selectedData = fullAllenData
 # remData = selectedData
 
-WFce = readMat("./data/finalWaveforms.mat");
+WFce = readMat(here("lookupTable","data","finalWaveforms.mat"));
 
 WFce$CellTypeNames = gsub("Juxt","Pyra",WFce$CellTypeNames)
 WFce$CellTypeNames = gsub("Axo_","PV",WFce$CellTypeNames)
@@ -51,7 +52,7 @@ refdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 refdata@meta.data <-cbind(refdata@meta.data,cType)
 refdata@meta.data = cbind(refdata@meta.data, thetaMod)
 
-load('./data/isi_cellExp.Rda')
+load(here("lookupTable","data","isi_cellExp.Rda"))
 X_ISI = t(isi)
 X_ISI = X_ISI[selectedData, ]
 dataSize = dim(X_ISI)
@@ -71,7 +72,7 @@ refdata[["features"]] = features_assay
 
 
 #
-WFce = readMat("./data/finalWaveforms.mat");
+WFce = readMat(here("lookupTable","data","finalWaveforms.mat"));
 WFce$CellTypeNames = gsub("Juxt","Pyra",WFce$CellTypeNames)
 WFce$CellTypeNames = gsub("Axo_","PV",WFce$CellTypeNames)
 
@@ -88,7 +89,7 @@ mapdata = CreateSeuratObject(counts = t(X_waveform), assay = "WF")
 mapdata@meta.data <-cbind(mapdata@meta.data,cType)
 mapdata@meta.data = cbind(mapdata@meta.data, thetaMod)
 
-load('./data/isi_cellExp.Rda')
+load(here("lookupTable","data","isi_cellExp.Rda"))
 X_ISI = t(isi)
 X_ISI = X_ISI[remData, ]
 dataSize = dim(X_ISI)
@@ -190,7 +191,7 @@ refdata <- FindMultiModalNeighbors(
   dims.list = list(1:40, 1:40,1:8), knn.range = 100
 )
 refdata <- RunUMAP(refdata, nn.name = "weighted.nn", 
-                reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", seed.use=3)
+                reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", seed.use=UMAP.SEED)
 
 refdata <- FindClusters(refdata, graph.name = "wsnn", algorithm = ALGORITHM, resolution = RESOLUTION, verbose = FALSE)
 

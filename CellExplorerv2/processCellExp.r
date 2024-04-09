@@ -4,6 +4,9 @@ setwd(basedir)
 library(tidyverse)
 library(caret)
 library(nnet)
+library(R.matlab)
+library(Seurat)
+
 UMAP.SEED = 3;
 ALGORITHM = 3;
 

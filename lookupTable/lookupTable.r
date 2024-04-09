@@ -1,13 +1,12 @@
 
-maxPCs = 3;
+maxPCs = 10;
 dims = 1:maxPCs
-
 
 cValues = c("orange","blue", "gray","red","magenta","cyan","yellow");
 
 refdata <- FindMultiModalNeighbors(
   refdata, reduction.list = list("WFpca","ISI1pca", 'featurespca'), 
-  dims.list = list(1:40, 1:40, 1:8), return.intermediate = TRUE,  knn.range = 50
+  dims.list = list(1:40, 1:40, 1:8), return.intermediate = TRUE,  knn.range = 100
 )
 refdata = RunSPCA(refdata, npcs=maxPCs, graph = "wsnn")
 
@@ -15,7 +14,7 @@ refdata.anchors = FindTransferAnchors(reference = refdata, query = mapdata,
                                       reference.reduction = "spca", dims=dims)
 
 refdata <- RunUMAP(refdata, nn.name = "weighted.nn", 
-                reduction.name = "wnn.umap2", reduction.key = "wnnUMAP2_", seed.use=3, return.model = TRUE)
+                reduction.name = "wnn.umap2", reduction.key = "wnnUMAP2_", seed.use=UMAP.SEED, return.model = TRUE)
 refdata.query <- MapQuery(anchorset = refdata.anchors, reference = refdata, 
                            query = mapdata,
                            refdata = list(celltype = "cType"), 
