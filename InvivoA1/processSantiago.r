@@ -1,23 +1,25 @@
+library(here)
+library(caret)
+
 basedir <- dirname(sys.frame(1)$ofile)
 setwd(basedir)
 
-library(caret)
+here::i_am("README.md")
 
-source("../constants.R")
+source(here::here("constants.R"))
 
 numpcs = 29
 dimV = 1:29
 cValues = c("orange","blue","red","lightgray");
-NC = 10
+NC = 5
 
-load(normalizePath('./A1data/jaramillo_celltypes.Rda'))
-load(normalizePath("./A1data/spikeWaveformsNormalized.Rda"))
-M = readMat("./A1data/santiagoQC.mat");
+load(here::here("InvivoA1","A1data","jaramillo_celltypes.Rda"))
+load(here::here("InvivoA1","A1data","spikeWaveformsNormalized.Rda"))
+M = readMat(here::here("InvivoA1","A1data","santiagoQC.mat"))
 
-load('./A1data/isiViolations.Rda')
-load('./A1data/ISI_dist.Rda')
-ISIv = readMat("./A1data/santiagoISI.mat");
-
+load(here::here("InvivoA1","A1data","isiViolations.Rda"))
+load(here::here("InvivoA1","A1data","ISI_dist.Rda"))
+ISIv = readMat(here::here("InvivoA1","A1data","santiagoISI.mat"))
 
 spikeQuality = M$X1[9,]
 selV = spikeQuality >= median(spikeQuality)
@@ -43,7 +45,7 @@ data@meta.data <-cbind(data@meta.data,cType)
 X_ISI1 = t(ISI_dist[,selV])
 X_ISI2 = ISIv$data[selV ,]
 
-spikeAmplitudes = read.csv("./A1data/spikeAmplitudes_Fixed.csv")
+spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
 spikeAmplitudes = spikeAmplitudes[selV,]
 
 X_ISI = X_ISI1
@@ -55,7 +57,7 @@ data[["ISI1"]] = ISI_assay
 
 
 
-spikeAmplitudes = read.csv("./A1data/spikeAmplitudes_Fixed.csv")
+spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
 spikeAmplitudes = spikeAmplitudes[selV,]
 
 X_ISI = X_ISI2
@@ -195,10 +197,10 @@ calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7)
   if(whichUMAP %in% c("wnn.umap","WFumap", "ISI1umap","ISI2umap", "wnn.umap2"))
   {
     print("using UMAP")
-    load('./A1data/spikeWidth.Rda')
-    load('./A1data/isiViolations.Rda')
+    load(here::here("InvivoA1","A1data","spikeWidth.Rda"))
+    load(here::here("InvivoA1","A1data","isiViolations.Rda"))
     
-    spikeAmplitudes = read.csv("./A1data/spikeAmplitudes_Fixed.csv")
+    spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
     
     spikeAmplitudes = spikeAmplitudes[selV,]
     
@@ -207,10 +209,10 @@ calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7)
     print(dim(E))
   }else
   {
-    load('./A1data/spikeWidth.Rda')
-    load('./A1data/isiViolations.Rda')
+    load(here::here("InvivoA1","A1data","spikeWidth.Rda"))
+    load(here::here("InvivoA1","A1data","isiViolations.Rda"))
     
-    spikeAmplitudes = read.csv("./A1data/spikeAmplitudes_Fixed.csv")
+    spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
     
     spikeAmplitudes = spikeAmplitudes[selV,]
     

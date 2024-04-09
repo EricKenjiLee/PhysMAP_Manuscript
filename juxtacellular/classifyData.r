@@ -213,7 +213,7 @@ p = p + theme(text=element_text(size=20)) + ylim(50,100)
 p = p + ggtitle(paste0("Classifier at Embedding-D = ",as.character(UMAP.components)))
 show(p)
 
-ggsave(paste0(as.character(UMAP.components),".jpg"), width = 10, height = 7)
+# ggsave(paste0(as.character(UMAP.components),".jpg"), width = 10, height = 7)
 
 # p<- ggplot(summaryData, aes(x=CellType, y=Acc))
 # p = p + theme_classic() +

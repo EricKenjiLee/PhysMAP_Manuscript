@@ -1,20 +1,23 @@
-basedir <- dirname(sys.frame(1)$ofile)
-setwd(basedir)
-
-source("../constants.R")
-source("./helperFunctions.r")
-
+library(here)
 library(ggExtra)
 library(ggpubr)
 library(scatterpie)
 library(reticulate)
+
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+here::i_am("README.md")
+
+source(here::here("constants.R"))
+source(here::here("juxtacellular","helperFunctions.R"))
 
 pcs = 1:30
 nDims = 30
 numComponents = UMAP.components #originally 10
 
 # Calculates the individual representations and plots them nicely.
-allData = readJianingData("./JianingData/MergedData.mat");
+allData = readJianingData(here::here("juxtacellular","JianingData","MergedData.mat"));
 juxtaData =  allData$data;
 tempFeat = calcRepresentation(juxtaData, 'features',5,1:5)
 juxtaData =  tempFeat$data;
@@ -141,8 +144,8 @@ pComb = p1 | p2 | p3
 show(pInd)
 show(pComb)
 
-load("./JianingData/width.Rda")
-load("./JianingData/ratio_p2t.Rda")
+load(here::here("juxtacellular","JianingData","width.Rda"))
+load(here::here("juxtacellular","JianingData","ratio_p2t.Rda"))
 
 # Show plots of points colored in different ways according to other variables
 # such as latency

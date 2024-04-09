@@ -6,6 +6,7 @@ library(caret)
 library(nnet)
 library(R.matlab)
 library(Seurat)
+library(aricode)
 
 UMAP.SEED = 3;
 ALGORITHM = 3;
