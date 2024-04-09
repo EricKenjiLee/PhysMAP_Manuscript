@@ -5,6 +5,8 @@ The following dependencies are not a strict requirement but are those in which w
 
 :warning:**WARNING**:warning:: If you are a reviewer of this manuscript, ___please do not star or fork this repo!___ Doing so breaks reviewer anonymity.
 
+Note: While this code reproduces figures in the associated manuscript, system (operating system) differences will result in plots that differ in appearance but this does not materially affect any results (see manuscript Supp. Fig. 2).
+
 ## Dependencies
 
 Seurat v4 (4.1.0)
