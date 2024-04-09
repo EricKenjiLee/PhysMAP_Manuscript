@@ -12,7 +12,7 @@ Note: While this code reproduces figures in the associated manuscript, system (o
 
 Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can be done by simply running the scripts described below for each session. The only requirement is to first install Seurat v4 (and specifically v4) as newer versions of Seurat are incompatible with this analysis. To do this, the following steps should be followed.
 
-### Installation of Seurat v4
+### Installation of Seurat v4 (Hao and Hao _et al._ 2021)
 
 ### Mouse S1 Juxtacellular Dataset (Yu _et al._ 2019)
 
