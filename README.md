@@ -16,13 +16,13 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
 ### Mouse S1 Juxtacellular Dataset (Yu _et al._ 2019)
 
 1) **processJianing.r**: This code produces all the analyses on the juxtacellular dataset in the manuscript with the exception of the classifier. The produced plots are as follows:
-  * A MARI (modified adjusted Rand index) plot over various clustering resolution parameter values.
-  * A UMAP plot of each of the three modalities used (waveform shape, ISI distribution, and PSTH) and also concatenated dataset.
-  * The visualized PhysMAP WNN colored by cell type plus depth, cell type, and by a sample clustering.
-  * The previous PhysMAP visualizations now with marker sized according to the univariate waveform features of spike width and peak-to-trough ratio.
-  * A scatterplot of log(spike width) and log(peak-to-trough) ratio with histograms on the marginals.
-  * PhysMAP with each unit now as a pie chart showing the proportion each modality contributes to its WNN connections.
-  * The weight that each modality contributes to each unit, now as a histogram
+   * A MARI (modified adjusted Rand index) plot over various clustering resolution parameter values.
+   * A UMAP plot of each of the three modalities used (waveform shape, ISI distribution, and PSTH) and also concatenated dataset.
+   * The visualized PhysMAP WNN colored by cell type plus depth, cell type, and by a sample clustering.
+   * The previous PhysMAP visualizations now with marker sized according to the univariate waveform features of spike width and peak-to-trough ratio.
+   * A scatterplot of log(spike width) and log(peak-to-trough) ratio with histograms on the marginals.
+   * PhysMAP with each unit now as a pie chart showing the proportion each modality contributes to its WNN connections.
+   * The weight that each modality contributes to each unit, now as a histogram
 2) **classifyData.r**: A classifier is trained on the dimensionality reduced WNN and compared against each modality individually and waveform features (spike width and peak-to-trough ratio).
 3) **classifyRaw.r**: A classifier is now trained on the full dataset (all modalities concatenated) to identify several cell types without application of PhysMAP.
 
