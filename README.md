@@ -4,7 +4,7 @@ R code for multi-modal analysis to delineate cell types using electrophysiology.
 
 :warning:**WARNING**:warning:: If you are a reviewer of this manuscript, ___please do not star or fork this repo!___ Doing so breaks reviewer anonymity. If you have problems running the code, please leave your questions on the review.
 
-Note: While this code reproduces figures in the associated manuscript, system (operating system) differences will result in plots that differ in appearance but this does not materially affect any results (see manuscript Supp. Fig. 2).
+**Note**: While this code reproduces figures in the associated manuscript, system (operating system) differences will result in plots that differ in appearance but this does not materially affect any results (see manuscript Supp. Fig. 2).
 
 ## Generating Manuscript Figures
 
