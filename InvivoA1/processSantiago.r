@@ -25,7 +25,8 @@ spikeQuality = M$X1[9,]
 selV = spikeQuality >= median(spikeQuality)
 selV = spikeQuality >= 4
 pValues = (M$X1[4,])/(M$X1[1,]+2)
-pValues = -log(M$X1[8,])
+#pValues = -log(M$X1[8,])
+#pValues = M$X1[8,]
 
 
 X_waveform = spikeWaveformsNormalized[selV ,]
@@ -144,7 +145,6 @@ p32 <- DimPlot(data, reduction = 'wnn.umap', label = FALSE, repel = TRUE,
                label.size = 8, group.by="cType", cols = cValues, pt.size = 2)
 p32 + theme_minimal()
 
-
 p31 <- DimPlot(data, reduction = 'wnn.umap', repel = TRUE, label.size = 8, pt.size = 4)
 p31 + theme_minimal()
 
@@ -186,10 +186,9 @@ pWF = plotProb(data, "WFplotumap", pValues[selV], cType)
 pISI = plotProb(data, "ISI2plotumap", pValues[selV], cType)
 show(pJoint | pWF | pISI)
 
-
-pJoint = plotProb(data, "wnn.umap", isiViolations[selV], cType)
-pWF = plotProb(data, "WFplotumap", isiViolations[selV], cType)
-show(pJoint | pWF)
+# pJoint = plotProb(data, "wnn.umap", isiViolations[selV], cType)
+# pWF = plotProb(data, "WFplotumap", isiViolations[selV], cType)
+# show(pJoint | pWF)
 
 
 calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7)

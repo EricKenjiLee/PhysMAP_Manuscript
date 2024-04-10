@@ -136,7 +136,6 @@ data = runAnalysis(data, whichAssay, RESOLUTION = RESOLUTION, normalize=TRUE, nu
 p1 = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2)
 pF = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2, group.by = "cType", 
                 cols=cValues) + theme_minimal() + ggtitle("Features")
-show(pF)
 dF = calcARI(data, "features")
 
 
@@ -145,7 +144,6 @@ data = runAnalysis(data, whichAssay, RESOLUTION = RESOLUTION, normalize=TRUE)
 p1 = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2)
 pACG = DimPlot(data, reduction = paste0(whichAssay, 'plotumap'), pt.size=2, group.by = "cType", 
              cols=cValues) + theme_minimal() + ggtitle("ACG")
-show(pACG)
 dA = calcARI(data, "ACG")
 
 
@@ -177,9 +175,9 @@ data <- FindMultiModalNeighbors(
   dims.list = list(1:40, 1:40,1:40,1:10)
 )
 data <- RunUMAP(data, nn.name = "weighted.nn", 
-                reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", seed.use=3)
+                reduction.name = "wnn.umap", reduction.key = "wnnUMAP_", seed.use=42)
 
-data <- FindClusters(data, graph.name = "wsnn", algorithm = 2, resolution = RESOLUTION, verbose = FALSE)
+data <- FindClusters(data, graph.name = "wsnn", algorithm = 1, resolution = RESOLUTION, verbose = FALSE)
 
 p33 <- DimPlot(data, reduction = 'wnn.umap', pt.size=2, label = FALSE, 
                repel = TRUE, label.size = 8)

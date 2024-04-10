@@ -156,7 +156,7 @@ acc1 = ggplot(melt(averageClass, id.vars = "cellClass")) +
   geom_line(aes(x=cellClass, y=value, group=variable, col=variable)) + 
   geom_point(aes(x=cellClass, y=value, group=variable, col=variable)) + theme_minimal()
 
-show(acc1)
+# show(acc1)
 
 
 # wilcox.test(allWf[1,], allWnn[1,], 
@@ -202,7 +202,7 @@ summaryData$se = summaryData$sd/sqrt(nreps)
 
 #summaryData <- rbind(summaryData,averageClassConcat)
 
-p<- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality))
+p <- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality))
 p = p + theme_classic() + 
   coord_cartesian(clip="off") +
   geom_point(aes(size=4), position=position_dodge(1)) +
