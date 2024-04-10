@@ -1,28 +1,31 @@
-basedir <- dirname(sys.frame(1)$ofile)
-setwd(basedir)
-
 library(tidyverse)
 library(caret)
 library(nnet)
 library(R.matlab)
 library(Seurat)
 library(aricode)
+library(here)
 
-UMAP.SEED = 3;
-ALGORITHM = 3;
+basedir <- dirname(sys.frame(1)$ofile)
+setwd(basedir)
+
+here::i_am("README.md")
+
+UMAP.SEED = 42;
+ALGORITHM = 1;
 
 
-rawD = readMat("./Data/theta_modulation_index.mat")
+rawD = readMat(here("CellExplorerv2","Data","theta_modulation_index.mat"))
 thetaMod = rawD$test
 
-featureData = readMat("../lookupTable/data/features_cellExp_final_Dec2023.mat")
-featureData = readMat("./Data/features_cellExp_new_Nov2023.mat")
+featureData = readMat(here("lookupTable","data","features_cellExp_final_Dec2023.mat"))
+featureData = readMat(here("CellExplorerv2","Data","features_cellExp_new_Nov2023.mat"))
 
 features = featureData$features
 
-acgData = readMat("./Data/CellExplorer_ACG.mat")
+acgData = readMat(here("Cellexplorerv2","Data","CellExplorer_ACG.mat"))
 
-WFce = readMat("./Data/finalWaveforms.mat");
+WFce = readMat(here("Cellexplorerv2","Data","finalWaveforms.mat"))
 X_waveform = WFce$X
 cType = WFce$CellTypeNames
 

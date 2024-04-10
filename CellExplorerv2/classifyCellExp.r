@@ -1,3 +1,4 @@
+library(ggthemes)
 
 doClassify = function(E, data, numIter = 10, numreps=2, 
                       method='boot')
@@ -18,7 +19,7 @@ doClassify = function(E, data, numIter = 10, numreps=2,
   AccO = c()
   for(k in 1:numIter)
   {
-   set.seed(k)
+    set.seed(k)
     print(k)
     i <- createDataPartition(E$origCells, times = 1, p = 0.7, list = FALSE)
     training = E[i[,1],]
@@ -26,7 +27,7 @@ doClassify = function(E, data, numIter = 10, numreps=2,
    
     ctrl <- trainControl(method = "repeatedcv", number=numreps)
     #fit a regression model and use k-fold CV to evaluate performance
-    model <- train(origCells~., data = training, method = "rbf", 
+    model <- train(origCells~., data = training, method = "rf", 
                    trControl = ctrl, verbose=FALSE)
     mean(model$results$Accuracy)
     cVpc = predict(model, newdata = testingset)
@@ -86,9 +87,6 @@ E3 = data.frame(Embeddings(data[["ISI1umap"]]))
 E4 = data.frame(Embeddings(data[["featuresumap"]]))
 E5 = data.frame(Embeddings(data[["ACGumap"]]))
 
-
-
-
 AccWnn = doClassify(E1, data)
 rawAccWNN = postProcess(AccWnn, "WNN")
 
@@ -109,11 +107,8 @@ combData = rbind(rawAccWNN, rawAccWf, rawAccISI, rawAccfeatures, rawAccACG)
 AvgData = data.frame(Wnn = AccWnn$AccO, Wf = AccWf$AccO, ACG = AccACG$AccO, isi = AccISI$AccO, features
                      =AccFeatures$AccO)
 
-
-
 colnames(combData) = c("CellType","Acc","Modality")
-nreps = 20
-library(ggthemes)
+nreps = 10
 summaryData = dataSummary(combData, varname="Acc", groupnames = c("CellType","Modality"))
 summaryData$se = summaryData$sd/sqrt(nreps)
 p<- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality)) + 
