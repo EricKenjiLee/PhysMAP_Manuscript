@@ -13,7 +13,7 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
 ### (Optional) Installation of Seurat v4 (Hao and Hao _et al._ 2021)
 
 
-### Mouse S1 Juxtacellular Dataset (Yu _et al._ 2019)
+### ```PhysMAP_Manuscript/juxtacellular``` (Mouse S1 Juxtacellular Dataset from Yu _et al._ 2019)
 
 1) **processJianing.r**: This code produces all the analyses on the juxtacellular dataset in the manuscript with the exception of the classifier. The produced plots are as follows:
    * A MARI (modified adjusted Rand index) plot over various clustering resolution parameter values.
@@ -26,11 +26,15 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
 2) **classifyData.r**: A classifier is trained on the dimensionality reduced WNN and compared against each modality individually and waveform features (spike width and peak-to-trough ratio).
 3) **classifyRaw.r**: A classifier is now trained on the full dataset (all modalities concatenated) to identify several cell types without application of PhysMAP.
 
-### Mouse A1 Probe Extracellular Dataset (Lakunina _et al._ 2020)
+### ```PhysMAP_Manuscript/InvivoA1``` (Mouse A1 Probe Extracellular Dataset from Lakunina _et al._ 2020)
 
-1) **processSantiago.r**:
+1) **processSantiago.r**: This code computes PhysMAP and also performs classification analysis on the dataset. It produces the following plots,
+   * A PhysMAP visualization with each opto-tagged cell type colored
+   * A sample unsupervised clustering of PhysMAP's WNN
+   * Side-by-side plots of PhysMAP, UMAP applied to waveform shape, and UMAP applied to ISI distribution. Marker size was determined by the level of "modulation" defined as the ratio of firing rates under stimulation and at baseline.
+   * A classifier trained to identify PV+, SOM+, and undefined (untagged) cells from PhysMAP's dimensionality reduced WNN.
 
-### Mouse Visual Cortex and Hippocampus Datasets (Petersen _et al._ 2021)
+### ```PhysMAP_Manuscript/CellExplorerv2``` (Mouse Visual Cortex and Hippocampus Datasets from Petersen _et al._ 2021)
 
 1) **processCellExp.r**: This script takes data from visual cortex and hippocampus provided as part of the CellExplorer dataset and analyzes them with PhysMAP. In particular, waveform shapes, ISI distributions, autocorrelograms, and "features" are used to compute the weighted representation. The features modality consist of the twelve measures mentioned in the methods section titled "Extracellular Mouse Visual Cortex and Hippocampus Dataset (CellExplorer). Further descriptions of these features can be found at https://cellexplorer.org/datastructure/standard-cell-metrics/. A series of plots are created:
    * a UMAP of each of four modalities side-by-side
@@ -41,9 +45,9 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
    * The WNN colored according to brain area plus cell type
 2) **classifyCellExp.r**: A cross-validated classifier is trained to identify one of six cell types (pyramidal, PV+, SST+, axo-axonic PV+, excitatory, and VIP+). This classifier is trained on the dimensionality reduced WNN representation.
 
-### Cell Type Classifier (Petersen _et al._ 2021)
+### ```PhysMAP_Manuscript/lookupTable``` (Cell Type Classifier built on data from Petersen _et al._ 2021)
 
-1) **mapReferenceAllen_Kenji.r**:
+1) **mapReferenceAllen_Kenji.r**: 
 2) **lookupTable.r**: 
 
 ## Session Info
