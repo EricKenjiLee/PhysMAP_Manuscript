@@ -47,8 +47,12 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
 
 ### ```PhysMAP_Manuscript/lookupTable``` (Cell Type Classifier built on data from Petersen _et al._ 2021)
 
-1) **mapReferenceAllen_Kenji.r**: 
-2) **lookupTable.r**: 
+1) **mapReference.r**: This applies PhysMAP to the data from CellExplorer. It produces the following plots,
+   * Side-by-side UMAP projections of waveform shape, ISI distribution, and the twelve univariate features
+   * A sample clustering of PhysMAP's WNN graph
+   * The PhysMAP projection colored by the cell type labels obtained from CellExplorer
+2) **lookupTable.r**: This script conducts the anchor alignment between the reference and query datasets. Note that only PV+, pyramidal, SST+, and VIP+ cells were uniquely considered because axo-axonic cells are a PV+ subtype, juxtacellular cells are excitatory cells recorded with a juxtacellular electrode, and VGAT+ cells are a pan-inhibitory type. This code produces the following plot and also outputs the true and predicted labels for each unit. 
+   * The reference dataset visualized with PhysMAP (left) and the query dataset of held-out data projected onto the reference data (right).
 
 ## Session Info
 The following dependencies are not a strict requirement but are those in which we know are compatible and are a snapshot of a working set. This project is <ins>not</ins> compatible with Seurat v5 as there were breaking changes introduced into our usage of anchor alignment.
