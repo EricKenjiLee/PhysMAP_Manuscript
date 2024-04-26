@@ -47,7 +47,7 @@ Regenerating the figures/results found in the manuscript Lee _et al._ 2024 can b
 
 ### ```PhysMAP_Manuscript/lookupTable``` (Cell Type Classifier built on data from Petersen _et al._ 2021)
 
-1) **mapReference.r**: This applies PhysMAP to the data from CellExplorer. It produces the following plots,
+1) **mapReferenceAllen_Kenji.r**: This applies PhysMAP to the data from CellExplorer. It produces the following plots,
    * Side-by-side UMAP projections of waveform shape, ISI distribution, and the twelve univariate features
    * A sample clustering of PhysMAP's WNN graph
    * The PhysMAP projection colored by the cell type labels obtained from CellExplorer
