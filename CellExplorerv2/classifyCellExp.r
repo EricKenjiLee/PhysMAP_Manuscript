@@ -1,6 +1,6 @@
 library(ggthemes)
 
-doClassify = function(E, data, numIter = 10, numreps=2, 
+doClassify = function(E, data, numIter = 10, numreps=5, 
                       method='boot')
 {
   tempCells = str_trim(data$cType)
@@ -17,15 +17,15 @@ doClassify = function(E, data, numIter = 10, numreps=2,
   Rs = runif(numIter);
   D = c()
   AccO = c()
-  for(k in 1:numIter)
+  for(k in 1:5)
   {
     set.seed(k)
     print(k)
-    i <- createDataPartition(E$origCells, times = 1, p = 0.7, list = FALSE)
+    i <- createDataPartition(E$origCells, times = 1, p = 0.8, list = FALSE)
     training = E[i[,1],]
     testingset = E[-i[,1],]
    
-    ctrl <- trainControl(method = "repeatedcv", number=numreps)
+    ctrl <- trainControl(method = "cv", number=5)
     #fit a regression model and use k-fold CV to evaluate performance
     model <- train(origCells~., data = training, method = "rf", 
                    trControl = ctrl, verbose=FALSE)
@@ -36,16 +36,17 @@ doClassify = function(E, data, numIter = 10, numreps=2,
     X$Balanced.Accuracy
     
     #X = X[c(4, 2, 3, 5, 1, 6),]
-    X = X[c(4, 3, 5,1,2, 6),]
+    X = X[c(4, 3, 5, 1, 2, 6),]
     
     D = rbind(D, X$Balanced.Accuracy)
     AccO[k] = cM$overall[1]
+    F1 = rbind(D, X$F1)
   }
 
 
   uF = data.frame(AccV = D*100)
   colnames(uF) = rownames(X)
-  return(list(uF = uF, AccO = AccO))
+  return(list(uF = uF, AccO = AccO, F1 = F1))
 }
 
 postProcess = function(accData, type)
@@ -78,9 +79,6 @@ data <- RunUMAP(data, nn.name = "weighted.nn",
                 n.components = 10
 )
 
-
-
-
 E1 = data.frame(Embeddings(data[["wnn.umap2"]]))
 E2 = data.frame(Embeddings(data[["WFumap"]]))
 E3 = data.frame(Embeddings(data[["ISI1umap"]]))
@@ -111,7 +109,7 @@ colnames(combData) = c("CellType","Acc","Modality")
 nreps = 10
 summaryData = dataSummary(combData, varname="Acc", groupnames = c("CellType","Modality"))
 summaryData$se = summaryData$sd/sqrt(nreps)
-p<- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality)) + 
+p <- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality)) + 
   geom_line() + theme_minimal() + 
   geom_point(aes(size=8)) +
   geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), width=.2,

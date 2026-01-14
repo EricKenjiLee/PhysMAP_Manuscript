@@ -26,8 +26,8 @@ p2 <- DimPlot(refdata.query, reduction = "ref.umap", group.by = "predicted.cellt
 
 p1 | p2
 
-iX = (mapdata$cType %in% c('PV','SST','Pyra','Juxt'))
-iX = (mapdata$cType %in% c('PV','Pyra','SST'))
+iX = (mapdata$cType %in% c('PV','SST','Pyra','VIP'))
+#iX = (mapdata$cType %in% c('PV','Pyra','SST'))
 
 table((refdata.query$predicted.celltype[iX] == mapdata$cType[iX]) )
 
