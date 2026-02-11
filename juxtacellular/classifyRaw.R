@@ -53,7 +53,10 @@ PSTH_assay <- CreateAssayObject(counts = t(PSTH))
 data[["PSTH"]] = PSTH_assay
 
 concat = cbind(WF, mergedISI, PSTH)
-E = data.frame(concat)
+variances = apply(concat, 2, var)
+concat = concat[, variances > 0]
+pca <- prcomp(concat, center = TRUE, scale. = TRUE)
+E <- data.frame(pca$x[, 1:50])
 
 layerData = temp$layer;
 colnames(layerData) = "Layer";
@@ -69,6 +72,8 @@ idx = tempCells %in% c("E-4","E-5","FS-4", "FS-5", "SOM-nan")
 E = E[idx,]
 tempCells = tempCells[idx]
 origCells = factor(tempCells)
+levels(origCells) <- make.names(levels(origCells))
+
 E$origCells = origCells
 
 allAcc = list()
@@ -80,7 +85,7 @@ for(k in 1:20){
   training = E[i[,1],]
   testingset = E[-i[,1],]
   
-  ctrl <- trainControl(method = "boot", number=5)
+  ctrl <- trainControl(method = "repeatedcv", number=5, repeats = 10, classProbs = TRUE)
   #fit a regression model and use k-fold CV to evaluate performance
   model <- train(origCells~., data = training, method = "gbm", 
                  trControl = ctrl, verbose=FALSE)

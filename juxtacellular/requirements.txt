@@ -1,0 +1,10 @@
+streamlit>=1.28.0
+scanpy>=1.9.0
+muon>=0.1.5
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scikit-learn>=1.3.0
+anndata>=0.10.0
+scipy>=1.10.0
