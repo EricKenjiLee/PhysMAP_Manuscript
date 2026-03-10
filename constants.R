@@ -13,5 +13,5 @@ UMAP.SEED = 42
 UMAP.neighbors = 20;
 UMAP.mindist = 0.2
 UMAP.metric = "cosine"
-UMAP.components = 50
+UMAP.components = 30
 norm.margin = 4 # 1 is features, 2 is cells

@@ -14,9 +14,9 @@ here::i_am("README.md")
 source(here::here("constants.R"))
 source(here::here("juxtacellular","helperFunctions.R"))
 
-pcs = 1:50
-nDims = 50
-numComponents = 50 #originally 10
+pcs = 1:30
+nDims = 30
+numComponents = 30 #originally 10
 
 # Calculates the individual representations and plots them nicely.
 allData = readJianingData(here::here("juxtacellular","JianingData","MergedData.mat"));
@@ -147,13 +147,17 @@ p = p + scale_size_continuous(range=c(0.5,5))
 p = p + theme_minimal() + ggtitle("Width of Waveform")
 pWidth = p
 
-
 p = ggplot(umapEmbeddings, aes(x=wnnUMAP_1, y=wnnUMAP_2)) + geom_point(aes(color=layerCellType, size=ratio_p2t))
 p = p + scale_size_continuous(range=c(.5,5))
 p = p + theme_minimal() + ggtitle("Peak to Trough")
 pP2t = p
 
-show(pWidth | pP2t)
+p = ggplot(umapEmbeddings, aes(x=wnnUMAP_1, y=wnnUMAP_2)) + geom_point(aes(color=layerCellType, size=latency))
+p = p + scale_size_continuous(range=c(.5,5))
+p = p + theme_minimal() + ggtitle("Latency")
+pLatency = p
+
+show(pWidth | pP2t | pLatency)
 
 pWidth.hist <- ggplot(umapEmbeddings,aes(x=width,fill=layerCellType)) + geom_histogram(alpha=0.5,position="identity") + scale_x_log10()
 
@@ -187,3 +191,103 @@ p = p + theme_minimal() + ggtitle("Latency")
 
 write.csv(umapEmbeddings, file = "umapEmbeddings.csv", row.names = FALSE)
 
+df <- data.frame(id = 1:246,celltype = juxtaData@meta.data$layerCellType, cluster_ix = juxtaData@meta.data$wsnn_res.2)
+class_counts <- df %>%
+  dplyr::group_by(cluster_ix, celltype) %>%
+  dplyr::summarise(Count = dplyr::n(), .groups = "drop")
+
+class_counts <- class_counts %>%
+  dplyr::group_by(cluster_ix) %>%
+  dplyr::mutate(Proportion = Count / sum(Count))
+
+ggplot(class_counts, aes(x = "", y = Proportion, fill = celltype)) +
+  geom_bar(stat = "identity", width = 1) +  # Bar chart for pie slices
+  coord_polar(theta = "y") +               # Convert to pie chart
+  facet_wrap(~cluster_ix) +           # One pie chart per secondary class
+  labs(title = "Composition of each cluster by cell type",
+       fill = "Primary Class") +
+  theme_void() +                           # Clean up the chart
+  theme(legend.position = "bottom")
+
+# --- Modality weight pie charts per cluster ---
+weightDF = data.frame(
+  cluster = juxtaData@meta.data$wsnn_res.2,
+  WF = juxtaData$WF.weight,
+  ISI = juxtaData$ISI.weight
+)
+
+meanWeights = weightDF %>%
+  dplyr::group_by(cluster) %>%
+  dplyr::summarise(WF = mean(WF), ISI = mean(ISI), .groups = "drop")
+
+# Relabel clusters as 1-indexed
+meanWeights$cluster = factor(as.integer(as.character(meanWeights$cluster)) + 1)
+
+meanWeightsLong = reshape2::melt(meanWeights, id.vars = "cluster",
+                                  variable.name = "Modality",
+                                  value.name = "Weight")
+
+pWeightPie = ggplot(meanWeightsLong, aes(x = "", y = Weight, fill = Modality)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  facet_wrap(~cluster) +
+  scale_fill_manual(values = c("WF" = "#F39922", "ISI" = "#12A84B")) +
+  labs(title = "Mean modality weight per cluster",
+       fill = "Modality") +
+  theme_void() +
+  theme(legend.position = "bottom",
+        text = element_text(size = 14))
+
+show(pWeightPie)
+
+# --- Cluster-averaged PSTH traces ---
+# Extract raw PSTH data (cells x 151 time bins) and WNN cluster assignments
+psthRaw = t(GetAssayData(juxtaData, assay = "PSTH", layer = "counts"))
+clusterIDs = juxtaData@meta.data$wsnn_res.2
+
+# Time axis: 151 bins at 1 ms resolution
+timeBins = seq(0, 150) - 50
+
+# Subset to 25–100 ms range (columns 26:101, corresponding to bins 25–100)
+timeIdx = which(timeBins >= -25 & timeBins <= 50)
+psthRaw = psthRaw[, timeIdx]
+timeBins = timeBins[timeIdx]
+
+# Build a long data frame: one row per cell per time bin
+psthDF = data.frame(
+  cluster = rep(clusterIDs, each = ncol(psthRaw)),
+  time = rep(timeBins, times = nrow(psthRaw)),
+  firing_rate = as.vector(t(psthRaw))
+)
+
+# Compute mean firing rate per cluster per time bin
+psthMean = psthDF %>%
+  dplyr::group_by(cluster, time) %>%
+  dplyr::summarise(mean_fr = mean(firing_rate), .groups = "drop")
+
+psthMin = psthDF %>%
+  dplyr::group_by(cluster, time) %>%
+  dplyr::summarise(min_fr = min(firing_rate), .groups = "drop")
+
+psthMax = psthDF %>%
+  dplyr::group_by(cluster, time) %>%
+  dplyr::summarise(mean_fr = max(firing_rate), .groups = "drop")
+
+# Normalize to global min/max across all clusters
+psthMean$norm_fr = (psthMean$mean_fr)
+
+# Relabel clusters as 1-indexed integers for cleaner legend
+psthMean$cluster = factor(as.integer(as.character(psthMean$cluster)) + 1)
+
+pPSTH = ggplot(psthMean, aes(x = time, y = norm_fr, color = cluster)) +
+  geom_line(size = 1.2) +
+  scale_x_continuous(breaks = c(-25, 0, 25, 50)) +
+  labs(x = "Time from whisker deflection (ms)",
+       y = "Normalized cluster averaged\nfiring rate (spikes/s)",
+       color = "Leiden Cluster\nMembership") +
+  theme_classic() +
+  theme(text = element_text(size = 14))
+
+show(pPSTH)
+
+source(here::here("juxtacellular","classifyDataTwoModality.r"))

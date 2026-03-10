@@ -1,7 +1,8 @@
-basedir <- dirname(sys.frame(1)$ofile)
-setwd(basedir)
+# Set working directory when sourced directly (not via here-based scripts)
 
-here::i_am("README.md")
+library(here)
+# Initialize here if not already set by the calling script
+tryCatch(here::i_am("README.md"), error = function(e) NULL)
 
 readJianingData = function(MatFile)
 {
@@ -60,7 +61,7 @@ readJianingData = function(MatFile)
   
   concat = cbind(WF, mergedISI, PSTH)
   rownames(concat) = cellIds
-  colnames(concat) = c(seq(1,602))
+  colnames(concat) = c(seq(1,602)) #602 for three; 451 for ISI+WF
   concat_assay <- CreateAssayObject(counts = t(concat))
   data[["concat"]] = concat_assay
   
@@ -70,7 +71,9 @@ readJianingData = function(MatFile)
   cellType = temp$true.cell.type;
   colnames(cellType) = "CellType"
   layerCellType = paste0(trimws(cellType),'-', trimws(layerData));
-  
+
+  isExcitatory = ifelse(trimws(cellType) == "E", "Excitatory", "Inhibitory")
+
   data@meta.data <-cbind(data@meta.data,layerData)
   data@meta.data <-cbind(data@meta.data,cellType)
   data@meta.data <-cbind(data@meta.data,depthV)
@@ -79,6 +82,7 @@ readJianingData = function(MatFile)
   data@meta.data <-cbind(data@meta.data, onset);
   data@meta.data <-cbind(data@meta.data, width)
   data@meta.data <-cbind(data@meta.data, ratio_p2t)
+  data$isExcitatory <- as.character(isExcitatory)
   
   F = data.frame(depth = depthV);
   F$latency = latency
@@ -110,7 +114,8 @@ calcRepresentation = function(data, whichAssay,
                               numpcs=50, 
                               dimV=1:50, 
                               plotTitle="", normalize=TRUE,
-                              metric=UMAP.metric, nc=2)
+                              metric=UMAP.metric, nc=2,
+                              k.nn=20)
 {
   # Does all the heavy lifting -- 
   #
@@ -118,14 +123,14 @@ calcRepresentation = function(data, whichAssay,
   
   DefaultAssay(data) = whichAssay
   if(normalize)
-      data <- NormalizeData(data,method="CLR", margin = norm.margin)
+      data <- NormalizeData(data, method="CLR", margin = norm.margin)
   data <- FindVariableFeatures(data)
   data <- ScaleData(data)
   data <- RunPCA(data, verbose = FALSE,  
                  reduction.name=paste0(whichAssay, 'pca'),
                  npcs=numpcs)
   data <- RunPCA(data, verbose = FALSE, npcs=numpcs)
-  data <- FindNeighbors(data, dims=dimV)
+  data <- FindNeighbors(data, dims=dimV, k.param=k.nn)
   data <- RunUMAP(data, dims=dimV, reduction.name=paste0(whichAssay, 'umap'),
                   metric = metric, n.components = nc, seed.use = UMAP.SEED)
   data <- RunUMAP(data, dims=dimV, reduction.name=paste0(whichAssay, 'umap2d'), metric = metric)
@@ -133,7 +138,13 @@ calcRepresentation = function(data, whichAssay,
   data <- FindClusters(data, algorithm = ALGORITHM, 
                        resolution = RESOLUTION, verbose = FALSE)
   
-  p1 = DimPlot(data, reduction = 'umap',  group.by = "layerCellType", pt.size=2) + ggtitle(plotTitle)
+  umapE = as.data.frame(Embeddings(data, reduction = 'umap'))
+  umapE$layerCellType = data$layerCellType
+  umapE$isExcitatory = data$isExcitatory
+  p1 = ggplot(umapE, aes(x = umap_1, y = umap_2, color = layerCellType, shape = isExcitatory)) +
+    geom_point(size = 2) +
+    scale_shape_manual(values = c("Excitatory" = 16, "Inhibitory" = 16)) +
+    ggtitle(plotTitle)
   p1 = p1 + theme_minimal()
   
   d1 = c()
@@ -153,4 +164,69 @@ calcRepresentation = function(data, whichAssay,
   return(list(data = data, p1 = p1, cellTypeARI=d1, layerCellTypeARI = d2));
 }
 
+dataSummary <- function(data, varname, groupnames){
+  require(plyr)
+  summaryFunc <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  dataSum<-ddply(data, groupnames, .fun=summaryFunc,
+                  varname)
+  dataSum <- rename(dataSum, c("mean" = varname))
+  return(dataSum)
+}
+
+doClassifyJuxta = function(E, seuratDat, numreps=5,
+                      method='boot', seedV=1, whichType='layercells')
+{
+
+  if(whichType == 'layercells')
+  {
+    tempCells = str_trim(seuratDat$layerCellType)
+    idx = tempCells %in% c("E-4","E-5","FS-4", "FS-5", "SOM-nan")
+
+    E = E[idx,]
+    tempCells = tempCells[idx]
+    origCells = factor(tempCells);
+  }
+  else{
+
+  origCells = factor(str_trim(seuratDat$CellType));
+
+  tempCells = str_trim(seuratDat$CellType)
+  idx = tempCells %in% c("E", "FS", "SOM")
+  E = E[idx,]
+  tempCells = tempCells[idx]
+  origCells = factor(tempCells);
+  }
+
+  E$origCells = origCells
+
+  # Remove rows with NA/NaN values (can appear from UMAP embeddings)
+  E <- E[complete.cases(E), ]
+  E$origCells <- droplevels(E$origCells)
+
+  set.seed(seedV)
+  i <- createDataPartition(E$origCells, times=1, p = 0.8, list = FALSE)
+  training = E[i[,1],]
+  testingset = E[-i[,1],]
+
+  ctrl <- trainControl(method = method, number=numreps)
+  #fit a regression model and use k-fold CV to evaluate performance
+  model <- train(origCells~., data = training, method = "gbm",
+                 trControl = ctrl, verbose=FALSE)
+  mean(model$results$Accuracy)
+  predict(model, newdata = testingset)
+
+  Rpred = confusionMatrix(predict(model, newdata = testingset), testingset$origCells)
+  Acc= Rpred$overall[1]
+
+  U = data.frame(Rpred$byClass)
+  U = U[c(3,1,5,2,4),]
+  Rpred
+
+  uF = data.frame(cellClass = rownames(U), AccV = U$Balanced.Accuracy*100)
+
+  return(list(uF = uF, AccV = Acc))
+}
 

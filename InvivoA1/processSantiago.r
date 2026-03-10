@@ -191,18 +191,24 @@ show(pJoint | pWF | pISI)
 # show(pJoint | pWF)
 
 
-calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7)
+calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7, rawFeatures=NULL)
 {
-  if(whichUMAP %in% c("wnn.umap","WFumap", "ISI1umap","ISI2umap", "wnn.umap2"))
+  if(!is.null(rawFeatures))
+  {
+    print("using raw PCA features")
+    E = rawFeatures
+    print(dim(E))
+  }
+  else if(whichUMAP %in% c("wnn.umap","WFumap", "ISI1umap","ISI2umap", "wnn.umap2"))
   {
     print("using UMAP")
     load(here::here("InvivoA1","A1data","spikeWidth.Rda"))
     load(here::here("InvivoA1","A1data","isiViolations.Rda"))
-    
+
     spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
-    
+
     spikeAmplitudes = spikeAmplitudes[selV,]
-    
+
     E = data.frame(Embeddings(data[[whichUMAP]]),spikeAmplitudes)
     # E = data.frame(Embeddings(data[[whichUMAP]]))
     print(dim(E))
@@ -210,11 +216,11 @@ calcAccuracy = function(data, whichUMAP, method, numreps=5, numIter=20, p=0.7)
   {
     load(here::here("InvivoA1","A1data","spikeWidth.Rda"))
     load(here::here("InvivoA1","A1data","isiViolations.Rda"))
-    
+
     spikeAmplitudes = read.csv(here::here("InvivoA1","A1data","spikeAmplitudes_Fixed.csv"))
-    
+
     spikeAmplitudes = spikeAmplitudes[selV,]
-    
+
     E = data.frame(spikeWidth[selV], spikeAmplitudes)
     print(dim(E))
   }
@@ -268,10 +274,19 @@ data <- RunUMAP(data, nn.name = "weighted.nn",
 
 
 
+# Build PCA-reduced concatenated raw data for classification
+concatRaw = cbind(t(GetAssayData(data, assay="WF")),
+                  t(GetAssayData(data, assay="ISI2")))
+variances = apply(concatRaw, 2, var)
+concatRaw = concatRaw[, variances > 0]
+concatPCA = prcomp(concatRaw, center = TRUE, scale. = TRUE)
+rawE = data.frame(concatPCA$x[, 1:ncol(concatPCA$x)])
+
 AccComb = calcAccuracy(data, "wnn.umap2", "repeatedcv", numIter=50)
 AccWF = calcAccuracy(data, "WFumap", "repeatedcv", numIter=50)
 AccFeatures = calcAccuracy(data, "features", "repeatedcv", numIter=50)
 AccISI = calcAccuracy(data, "ISI1umap", "repeatedcv", numIter=50)
+AccRaw = calcAccuracy(data, "raw", "repeatedcv", numIter=50, rawFeatures=rawE)
 
 
 # AccWF = calcAccuracy(data, "WFumap", "cv", numIter=10)
@@ -315,7 +330,13 @@ rownames(rawAccData) = seq(1,nreps)
 rawAccDataFeatures = melt(rawAccData)
 rawAccDataFeatures["Type"] = "Features"
 
-combData = rbind(rawAccDataWF, rawAccDataComb, rawAccDataISI, rawAccDataFeatures)
+rawAccData = AccRaw
+colnames(rawAccData) = c("PV","SOM","UNDEF")
+rownames(rawAccData) = seq(1,nreps)
+rawAccDataRaw = melt(rawAccData)
+rawAccDataRaw["Type"] = "Raw"
+
+combData = rbind(rawAccDataWF, rawAccDataComb, rawAccDataISI, rawAccDataFeatures, rawAccDataRaw)
 
 colnames(combData) = c("Run","CellType","Acc","Modality")
 
@@ -324,7 +345,7 @@ summaryData = dataSummary(combData, varname="Acc", groupnames = c("CellType","Mo
 summaryData$se = summaryData$sd/sqrt(nreps)
 p<- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality)) + 
   geom_line() + theme_classic() +  
-  geom_point(aes(size=8)) + theme(text = element_text(size=20)) + ylim(0.7,1.0) + 
+  geom_point(aes(size=8)) + theme(text = element_text(size=20)) + ylim(0.5,1.0) + 
   geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), width=.2,
                 position=position_dodge(0.0))
 

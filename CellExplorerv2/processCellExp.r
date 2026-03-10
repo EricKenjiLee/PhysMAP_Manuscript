@@ -6,26 +6,23 @@ library(Seurat)
 library(aricode)
 library(here)
 
-basedir <- dirname(sys.frame(1)$ofile)
-setwd(basedir)
-
 here::i_am("README.md")
 
 UMAP.SEED = 42;
 ALGORITHM = 1;
 
 
-rawD = readMat(here("CellExplorerv2","Data","theta_modulation_index.mat"))
+rawD = readMat(here::here("CellExplorerv2","Data","theta_modulation_index.mat"))
 thetaMod = rawD$test
 
-featureData = readMat(here("lookupTable","data","features_cellExp_final_Dec2023.mat"))
-featureData = readMat(here("CellExplorerv2","Data","features_cellExp_new_Nov2023.mat"))
+featureData = readMat(here::here("lookupTable","data","features_cellExp_final_Dec2023.mat"))
+featureData = readMat(here::here("CellExplorerv2","Data","features_cellExp_new_Nov2023.mat"))
 
 features = featureData$features
 
-acgData = readMat(here("Cellexplorerv2","Data","CellExplorer_ACG.mat"))
+acgData = readMat(here::here("Cellexplorerv2","Data","CellExplorer_ACG.mat"))
 
-WFce = readMat(here("Cellexplorerv2","Data","finalWaveforms.mat"))
+WFce = readMat(here::here("Cellexplorerv2","Data","finalWaveforms.mat"))
 X_waveform = WFce$X
 cType = WFce$CellTypeNames
 
@@ -59,7 +56,7 @@ area = unlist(featureData$area)
 data@meta.data = cbind(data@meta.data, area)
 
 
-load('./Data/isi_cellExp.Rda')
+load(here::here("CellExplorerv2", "Data", "isi_cellExp.Rda"))
 X_ISI = t(isi)
 dataSize = dim(X_ISI)
 rownames(X_ISI) = cellIds

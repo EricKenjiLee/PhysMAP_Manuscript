@@ -51,9 +51,9 @@ doClassify = function(E, seuratDat, numreps=5,
   training = E[i[,1],]
   testingset = E[-i[,1],]
 
-  ctrl <- trainControl(method = method, number=numreps)
+  ctrl <- trainControl(method = method, number=numreps, repeats=repeats)
   #fit a regression model and use k-fold CV to evaluate performance
-  model <- train(origCells~., data = training, method = "gbm", 
+  model <- train(origCells~., data = training, method = "gbm",
                  trControl = ctrl, verbose=FALSE)
   mean(model$results$Accuracy)
   predict(model, newdata = testingset)
@@ -74,7 +74,7 @@ doClassify = function(E, seuratDat, numreps=5,
 juxtaData <- RunUMAP(juxtaData, nn.name = "weighted.nn", 
                 reduction.name = "wnn.umap2", 
                 reduction.key = "wnnUMAP2_", seed.use=UMAP.SEED, 
-                n.components = UMAP.components, metric = "correlation")
+                n.components = UMAP.components, metric = "cosine")
 
 
 pb <- txtProgressBar(min = 1,      # Minimum value of the progress bar
@@ -183,7 +183,7 @@ rawAccData = t(allWnn)
 colnames(rawAccData) = currAccWnn$uF$cellClass
 rownames(rawAccData) = seq(1,nreps)
 rawAccDataWNN = melt(rawAccData)
-rawAccDataWNN["Type"] = "WNN"
+rawAccDataWNN["Type"] = "PhysMAP"
 
 rawAccData = t(allWf)
 colnames(rawAccData) = currAccWnn$uF$cellClass
@@ -233,10 +233,10 @@ summaryData$se = summaryData$sd/sqrt(nreps)
 p <- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality))
 p = p + theme_classic() + 
   coord_cartesian(clip="off") +
-  geom_point(aes(size=4), position=position_dodge(1)) +
-  geom_line(aes(size=0.2), position=position_dodge(1)) +
+  geom_point(aes(size=4), position=position_dodge(0.3)) +
+  geom_line(aes(size=0.2), position=position_dodge(0.3)) +
   geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), width=.2,
-                position=position_dodge(1)) 
+                position=position_dodge(0.3)) 
 p = p + theme(text=element_text(size=20)) + ylim(50,100)
 p = p + ggtitle(paste0("Classifier at Embedding-D = ",as.character(UMAP.components)))
 show(p)

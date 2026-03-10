@@ -8,3 +8,4 @@
 *.pdf
 *.Rapp
 *Rhistory
+.Rproj.user

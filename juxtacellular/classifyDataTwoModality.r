@@ -1,10 +1,11 @@
 library(tidyverse)
 library(caret)
 library(nnet)
+library(xgboost)
 
 set.seed(42)
 
-basedir <- dirname(sys.frame(1)$ofile)
+basedir <- here::here("juxtacellular")
 setwd(basedir)
 
 dataSummary <- function(data, varname, groupnames){
@@ -18,7 +19,7 @@ dataSummary <- function(data, varname, groupnames){
   return(dataSum)
 }
 
-doClassify = function(E, seuratDat, numreps=5, numrepeats=10,
+doClassify = function(E, seuratDat, numreps=5, repeats=10,
                       method='repeatedcv', seedV=1, whichType='layercells')
 {
   if(whichType == 'layercells')
@@ -50,9 +51,9 @@ doClassify = function(E, seuratDat, numreps=5, numrepeats=10,
   training = E[i[,1],]
   testingset = E[-i[,1],]
 
-  ctrl <- trainControl(method = method, number=numreps)
+  ctrl <- trainControl(method = method, number=numreps, repeats=repeats)
   #fit a regression model and use k-fold CV to evaluate performance
-  model <- train(origCells~., data = training, method = "gbm",
+  model <- train(origCells~., data = training, method = "kknn", #"gbm" originally
                  trControl = ctrl, verbose=FALSE)
   mean(model$results$Accuracy)
   predict(model, newdata = testingset)
@@ -220,12 +221,12 @@ summaryData$se = summaryData$sd/sqrt(nreps)
 p <- ggplot(summaryData, aes(x=CellType, y=Acc, group=Modality, color=Modality))
 p = p + theme_classic() +
   coord_cartesian(clip="off") +
-  geom_point(aes(size=4), position=position_dodge(0.3)) +
-  geom_line(aes(size=0.2), position=position_dodge(0.3), alpha=0.3) +
+  geom_point(aes(size=0.19), position=position_dodge(0.3)) +
+  geom_line(aes(size=0.175), position=position_dodge(0.3), alpha=0.3) +
   geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), width=.5,
                 position=position_dodge(0.3))
 p = p + theme(text=element_text(size=20)) + ylim(50,100)
-p = p + ggtitle(paste0("Classifier at Embedding-D = ",as.character(UMAP.components)))
+p = p
 show(p)
 
 # ggsave(paste0(as.character(UMAP.components),".jpg"), width = 10, height = 7)
